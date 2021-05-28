@@ -1,10 +1,8 @@
-
 # # Machine Learning Interpretability for Heart Disease Prediction
 # 
 # #### It’s time to get rid of the black boxes and cultivate trust in Machine Learning
-# 
-# Importing necessary libraries
 
+# Importing necessary libraries
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -24,7 +22,6 @@ from pdpbox import pdp
 import shap 
 import lime
 import lime.lime_tabular
-
 
 # ## Dataset features description
 # This dataset consists of 13 features and a target variable. The detailed description of all the features are as follows:
@@ -48,14 +45,11 @@ import lime.lime_tabular
 # 14. **target :**  Heart disease [0 = no, 1 = yes]
 
 # ## Exploring & Preparing the data
-
 dt = pd.read_csv('heart.csv')
 dt_Shape = {"Total Rows": [len(dt.index)], "Total Columns": [len(dt.columns)]}
 dt_Shape = pd.DataFrame(dt_Shape,index=["Values"])
-dt_Shape.transpose()
-
-dt.head()
-
+print(dt_Shape.transpose())
+print(dt.head())
 
 # Let's change the column names to be a bit clearer
 
@@ -63,17 +57,10 @@ dt.head()
 dt.columns = ['age', 'sex', 'chest_pain_type', 'resting_blood_pressure', 'cholesterol', 'fasting_blood_sugar', 
               'rest_ecg', 'max_heart_rate_achieved','exercise_induced_angina', 'st_depression', 'st_slope','major vessels', 
               'thalassemia','target']
-dt.head(10)
-
-
+print(dt.head(10))
 
 dt.hist(bins=50, figsize = (20,15), alpha = 0.8)
 plt.show()
-
-
-# This gives an overview of the distributions of all the features. We can see that the dataset is relatively balanced, i.e. there is a similar number of patients with and without heart disease. 
-
-
 
 dt['sex'][dt['sex'] == 0] = 'female'
 dt['sex'][dt['sex'] == 1] = 'male'
@@ -100,9 +87,9 @@ dt['st_slope'][dt['st_slope'] == 2] = 'downsloping'
 dt['thalassemia'][dt['thalassemia'] == 1] = 'normal'
 dt['thalassemia'][dt['thalassemia'] == 2] = 'fixed defect'
 dt['thalassemia'][dt['thalassemia'] == 3] = 'reversable defect'
-dt.dtypes
+print(dt.dtypes)
 
-dt.shape
+print(dt.shape)
 
 # We will scale the numerical data so that each of the features has mean 0 and standard deviation 1. The categorical data will be one hot encoded, and the binary data will be left alone. 
 
@@ -110,20 +97,17 @@ dt.shape
 #dropping row with st_slope =0
 dt.drop(dt[dt.thalassemia ==0].index, inplace=True)
 #checking distribution
-dt['thalassemia'].value_counts()
-
+print(dt['thalassemia'].value_counts())
 
 # Encoding categorical variables
-
 # dt = pd.get_dummies(dt, drop_first=True)
 dt = pd.get_dummies(dt)
-dt.head()
+print(dt.head())
 
-dt.shape
+print(dt.shape)
 
 
 # Distribution of Heart disease (target variable)
-
 fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, sharey=False, figsize=(14,6))
 
 ax1 = dt['target'].value_counts().plot.pie( x="Heart disease" ,y ='no.of patients', 
@@ -142,30 +126,27 @@ print("Percentage of Patients Haven't Heart Disease: {:.2f}%".format((countNoDis
 print("Percentage of Patients Have Heart Disease: {:.2f}%".format((countHaveDisease / (len(dt.target))*100)))
 
 
-dt.groupby('target').mean()
+print(dt.groupby('target').mean())
 
 X = dt.drop(['target'],axis=1)
 y = dt['target']
 # Train Test Split
 X_train, X_test, y_train, y_test = train_test_split(X, y, stratify=y, test_size=0.2,shuffle=True, random_state=5)
 # checking the shape of dataset
-X.shape
+print(X.shape)
 
 from sklearn.preprocessing import MinMaxScaler
 scaler = MinMaxScaler()
 X_train[['age','resting_blood_pressure','cholesterol','max_heart_rate_achieved','st_depression']] = scaler.fit_transform(X_train[['age','resting_blood_pressure','cholesterol','max_heart_rate_achieved','st_depression']])
-X_train.head(10)
+print(X_train.head(10))
 
 X_test[['age','resting_blood_pressure','cholesterol','max_heart_rate_achieved','st_depression']] = scaler.transform(X_test[['age','resting_blood_pressure','cholesterol','max_heart_rate_achieved','st_depression']])
-X_test.head()
-
+print(X_test.head())
 
 # ## Training the models
 # Here we will train a random forest and logistic regression model.
 # 
 # Logistic regression is a readily interpretable model which allows us to determine the linear relationship between the features and the target. A random forest is a 'black box' model, which will require a little more work to interpret, but which will allow us to view the non-linear relationships between the features and the model predictions.
-# 
-
 
 logit = LogisticRegression(random_state = 0)
 logit.fit(X_train, y_train)
@@ -178,8 +159,7 @@ rec = recall_score(y_test, y_pred)
 f1 = f1_score(y_test, y_pred)
 results = pd.DataFrame([['Base - Logistic Regression', acc,prec,rec, f1,roc]],
                        columns = ['Model', 'Accuracy', 'Precision', 'Recall', 'F1 Score','ROC'])
-results
-
+print(results)
 
 
 # random_forest = RandomForestClassifier(n_estimators=500,criterion='entropy',max_depth=5).fit(X_train, y_train)
@@ -198,7 +178,7 @@ f1 = f1_score(y_test, y_pred)
 model_results = pd.DataFrame([['Random Forest', acc,prec,rec, f1,roc]],
                columns = ['Model', 'Accuracy', 'Precision', 'Recall', 'F1 Score','ROC'])
 results = results.append(model_results,sort=True)
-results
+print(results)
 
 
 # ## Feature Importance
