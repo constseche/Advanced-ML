@@ -1,5 +1,9 @@
 import pandas as pd
 import numpy as np
+import sns as sns
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from IPython.core.display import display
 from costcla import BayesMinimumRiskClassifier
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.metrics import confusion_matrix,  classification_report
@@ -9,8 +13,9 @@ from sklearn.svm import LinearSVC, SVC
 from imblearn.under_sampling import RandomUnderSampler
 from imblearn.over_sampling import RandomOverSampler
 from collections import Counter
+from sklearn.preprocessing import StandardScaler
 from costcla.sampling import cost_sampling, undersampling
-
+import seaborn as sns
 sns.set_context('talk')
 
 def explainability(X_train, y_train, X_test, y_val):
@@ -26,14 +31,14 @@ def explainability(X_train, y_train, X_test, y_val):
     from eli5.sklearn import PermutationImportance
     from eli5 import explain_prediction
 
-    perm = PermutationImportance(rf_model, random_state=123).fit(X_val, y_val)
+    perm = PermutationImportance(rf_model, random_state=123).fit(X_test, y_val)
 
     display(eli5.show_weights(perm, feature_names=X_train.columns.tolist(), top=24))
 
     eli5.show_prediction(rf_model, X_test.iloc[50],
                          feature_names=X_test.columns.tolist(), show_feature_values=True)
     y_pred = rf_model.predict(X_test)
-    print('Random Forest loss:', cost_sensitive_learning.cost_scores(y_pred, y_val))
+    print('Random Forest loss:', cost_scores(y_pred, y_val))
 
     # ========================= SHAP ===================================
 
@@ -358,17 +363,17 @@ def voting_scores(X_train, y_train, X_test, y_test):
     return rej_loss
 
 
-def run():
-    data = pd.read_csv("venv/data/fetal_health.csv")
-    X_train, X_test, y_train, y_test = pre_processing_data.pre_processing_binary(data)
-    # # explainable(X_train, y_train, X_test,  y_test)
-    # default_loss = default_metrics(X_train, y_train, X_test, y_test)
-    # under_loss, over_loss, comb_loss =  rebalancing(X_train, y_train, X_test, y_test)
-    # class_weighting_loss = class_weighting(X_train, y_train, X_test, y_test)
-    # rej_loss = voting_scores(X_train, y_train, X_test, y_test)
-    # df2 = pd.DataFrame(np.array([default_loss, comb_loss, class_weighting_loss, rej_loss]))
-    # # df2 = df2.T
-    # # df2.columns = ['default', 'oversampling', 'class_weighting', 'rejection_sampling']
-    # # print(df2)
-    # tolist = df2.values.tolist()
-    # grouped_bar(tolist)
+# def run():
+data = pd.read_csv("data/fetal_health.csv")
+X_train, X_test, y_train, y_test = pre_processing(data)
+# # explainable(X_train, y_train, X_test,  y_test)
+default_loss = default_metrics(X_train, y_train, X_test, y_test)
+under_loss, over_loss, comb_loss =  rebalancing(X_train, y_train, X_test, y_test)
+class_weighting_loss = class_weighting(X_train, y_train, X_test, y_test)
+rej_loss = voting_scores(X_train, y_train, X_test, y_test)
+df2 = pd.DataFrame(np.array([default_loss, comb_loss, class_weighting_loss, rej_loss]))
+# df2 = df2.T
+# df2.columns = ['default', 'oversampling', 'class_weighting', 'rejection_sampling']
+# print(df2)
+tolist = df2.values.tolist()
+grouped_bar(tolist)

@@ -1,6 +1,4 @@
 
-import pre_processing_data
-
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -19,8 +17,10 @@ from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
 from costcla.metrics import cost_loss
 
+import cost_sensitive_learning
+
 data = pd.read_csv("venv/data/fetal_health.csv")
-X_train, X_test, y_train, y_test = pre_processing_data.pre_processing(data)
+X_train, X_test, y_train, y_test = cost_sensitive_learning.pre_processing(data)
 
 #fp, fn, tp, tn
 # create an example-dependent cost-matrix required by costclas
@@ -55,7 +55,6 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.calibration import CalibratedClassifierCV
 from costcla.models import BayesMinimumRiskClassifier
 
-data = load_breast_cancer()
 X_train, X_test, y_train, y_test = train_test_split(data.data, data.target, test_size=0.3, random_state=0)
 # 0 is malignant, 1 is benign
 #fp, fn, tp, tn
