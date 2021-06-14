@@ -11,6 +11,121 @@ from imblearn.over_sampling import RandomOverSampler
 from collections import Counter
 from costcla.sampling import cost_sampling, undersampling
 
+sns.set_context('talk')
+
+def explainability(X_train, y_train, X_test, y_val):
+
+    # svc_model = LinearSVC(random_state=0).fit(X_train, y_train)
+    # y_pred = svc_model.predict(X_val)
+    # print('SVC loss:', cost_score(y_pred, y_val))
+    rf_model = RandomForestClassifier(n_estimators = 200, min_samples_split= 10, min_samples_leaf =  1, max_features = 'auto', max_depth =  20, bootstrap =  False, random_state=0).fit(X_train, y_train)
+
+    # ======================== Permutation ===============================
+
+    import eli5
+    from eli5.sklearn import PermutationImportance
+    from eli5 import explain_prediction
+
+    perm = PermutationImportance(rf_model, random_state=123).fit(X_val, y_val)
+
+    display(eli5.show_weights(perm, feature_names=X_train.columns.tolist(), top=24))
+
+    eli5.show_prediction(rf_model, X_test.iloc[50],
+                         feature_names=X_test.columns.tolist(), show_feature_values=True)
+    y_pred = rf_model.predict(X_test)
+    print('Random Forest loss:', cost_sensitive_learning.cost_scores(y_pred, y_val))
+
+    # ========================= SHAP ===================================
+
+    import shap
+
+    explainer = shap.TreeExplainer(rf_model)
+    shap_values = explainer.shap_values(X_test)
+    shap.summary_plot(shap_values, X_test)
+
+    shap.summary_plot(shap_values[0], X_test)
+    shap.summary_plot(shap_values[1], X_test)
+    shap.summary_plot(shap_values[2], X_test)
+
+    return
+
+def pre_processing(data):
+
+    # Split df into X and y
+    y = data['fetal_health']
+    X = data.drop('fetal_health', axis=1)
+    # print(data.describe())
+
+    # Train-test split
+    X_train, X_test, y_train, y_test = train_test_split(X, y, shuffle=True, test_size=0.25, stratify=y, random_state=2)
+
+    # StandardScaler
+    scaler = StandardScaler()
+    scaler.fit(X_train)
+    X_train = pd.DataFrame(scaler.transform(X_train), index=X_train.index, columns=X_train.columns)
+    X_test = pd.DataFrame(scaler.transform(X_test), index=X_test.index, columns=X_test.columns)
+
+
+    return X_train, X_test, y_train, y_test
+
+
+def pre_processing_binary(data):
+
+    y = data['fetal_health']
+
+    for i in range(2126):
+        if y[i] == 1.0:
+            y[i] = 0.0
+        elif y[i] == 3.0:
+            y[i] = 1.0
+        elif y[i] == 2.0:
+            y[i] = 1.0
+
+    X = data.drop('fetal_health', axis=1)
+    # print(data.describe())
+
+    # Train-test split
+    X_train, X_test, y_train, y_test = train_test_split(X, y, shuffle=True, test_size=0.25, stratify=y, random_state=2)
+    # Scale X
+    scaler = StandardScaler()
+    scaler.fit(X_train)
+    X_train = pd.DataFrame(scaler.transform(X_train), index=X_train.index, columns=X_train.columns)
+    X_test = pd.DataFrame(scaler.transform(X_test), index=X_test.index, columns=X_test.columns)
+
+    y_test = np.asarray(y_test, dtype=int)
+    y_train = np.asarray(y_train, dtype=int)
+
+    return X_train, X_test, y_train, y_test
+
+def grouped_bar(loss_arr):
+
+    methods = ['Default', 'Undersampling+Oversampling', 'Class Weighting', 'Costing-Rejection Sampling']
+    labels = ['Linear SVC', 'Random Forest', 'Naive Bayes']
+    width = 0.8 / len(loss_arr)
+    Pos = np.array(range(len(loss_arr[0])))
+    fig, ax = plt.subplots(figsize=(12, 10))
+    bars = []
+    for i in range(len(loss_arr)):
+        bars.append(ax.bar(Pos + i * width, loss_arr[i], width=width, label=methods[i]))
+
+    ax.set_xticks(Pos + width / 4)
+    ax.set_xticklabels(labels)
+    ax.bar_label(bars[0], padding=3)
+    ax.bar_label(bars[1], padding=3)
+    ax.bar_label(bars[2], padding=3)
+    ax.bar_label(bars[3], padding=3)
+    ax.legend()
+    fig.tight_layout(pad=0.4, w_pad=0.5, h_pad=1.0)
+    plt.show()
+
+    return
+
+
+
+
+
+
+
 
 def cost_scores(y_pred, y_test):
 
@@ -241,3 +356,19 @@ def voting_scores(X_train, y_train, X_test, y_test):
     print('Naive Bayes with rejection sampling:', loss)
 
     return rej_loss
+
+
+def run():
+    data = pd.read_csv("venv/data/fetal_health.csv")
+    X_train, X_test, y_train, y_test = pre_processing_data.pre_processing_binary(data)
+    # # explainable(X_train, y_train, X_test,  y_test)
+    # default_loss = default_metrics(X_train, y_train, X_test, y_test)
+    # under_loss, over_loss, comb_loss =  rebalancing(X_train, y_train, X_test, y_test)
+    # class_weighting_loss = class_weighting(X_train, y_train, X_test, y_test)
+    # rej_loss = voting_scores(X_train, y_train, X_test, y_test)
+    # df2 = pd.DataFrame(np.array([default_loss, comb_loss, class_weighting_loss, rej_loss]))
+    # # df2 = df2.T
+    # # df2.columns = ['default', 'oversampling', 'class_weighting', 'rejection_sampling']
+    # # print(df2)
+    # tolist = df2.values.tolist()
+    # grouped_bar(tolist)
