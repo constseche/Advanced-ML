@@ -1,7 +1,3 @@
-
-import numpy as np
-import matplotlib.pyplot as plt
-
 import pandas as pd
 
 # from sklearn.datasets import load_breast_cancer
@@ -126,7 +122,6 @@ import numpy as np
 from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, classification_report
-from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
 from costcla.metrics import cost_loss
 from imblearn.under_sampling import RandomUnderSampler
@@ -205,9 +200,7 @@ import numpy as np
 from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, classification_report
-from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.tree import DecisionTreeClassifier
 from costcla.metrics import cost_loss
 
 data = load_breast_cancer()
@@ -264,10 +257,7 @@ import time
 from sklearn import datasets
 from sklearn import tree
 from sklearn.model_selection import cross_val_score
-from sklearn.ensemble import BaggingClassifier
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.neural_network import MLPClassifier
-from sklearn.svm import LinearSVC
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.ensemble import AdaBoostClassifier
 
