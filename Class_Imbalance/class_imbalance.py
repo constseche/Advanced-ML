@@ -7,10 +7,14 @@ from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.svm import LinearSVC
 from sklearn.linear_model import SGDClassifier
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import classification_report, f1_score, recall_score, precision_score
+from sklearn.metrics import classification_report, f1_score, recall_score, precision_score, balanced_accuracy_score, roc_auc_score
+from sklearn import metrics
 from imblearn.over_sampling import SMOTE
 from imblearn.under_sampling import TomekLinks 
 from imblearn.under_sampling import NearMiss
+import numpy as np
+import math
+from sklearn.metrics import roc_curve,auc
 
 df = pd.read_csv("fetal_health.csv")
 
@@ -44,54 +48,6 @@ plt.title("Correlation Matrix")
 plt.show()
 
 
-sns.jointplot(x="accelerations", y="uterine_contractions", data=df, hue="fetal_health")
-plt.show()
-
-
-
-sns.jointplot(x="prolongued_decelerations", y="uterine_contractions", data=df, hue="fetal_health")
-plt.show()
-
-plt.figure(figsize=(25, 25))
-sns.displot(df, x="prolongued_decelerations", hue="fetal_health", kind="kde", fill=True)
-plt.show()
-
-eda = df[df['fetal_health']!=1.0]
-plt.figure(figsize=(25, 25))
-sns.displot(eda, x="prolongued_decelerations", hue="fetal_health", kind="kde", fill=True)
-plt.show()
-
-eda_normal = df[df['fetal_health']==1.0]
-plt.figure(figsize=(25, 25))
-sns.displot(eda_normal, x="prolongued_decelerations", hue="fetal_health", kind="kde", fill=True)
-plt.show()
-
-sns.jointplot(x="accelerations", y="abnormal_short_term_variability", data=df, hue="fetal_health")
-plt.show()
-
-sns.jointplot(x="percentage_of_time_with_abnormal_long_term_variability", y="abnormal_short_term_variability", data=df, hue="fetal_health")
-plt.show()
-
-plt.figure(figsize=(25, 25))
-sns.displot(df, x="percentage_of_time_with_abnormal_long_term_variability", hue="fetal_health", kind="kde", fill=True)
-plt.show()
-
-plt.figure(figsize=(25, 25))
-sns.displot(eda, x="percentage_of_time_with_abnormal_long_term_variability", hue="fetal_health", kind="kde", fill=True)
-plt.show()
-
-plt.figure(figsize=(25, 25))
-sns.displot(eda_normal, x="percentage_of_time_with_abnormal_long_term_variability", hue="fetal_health", kind="kde", fill=True)
-plt.show()
-
-plt.figure(figsize=(25, 25))
-sns.displot(df, x="abnormal_short_term_variability", hue="fetal_health", kind="kde", fill=True)
-plt.show()
-
-plt.figure(figsize=(25, 25))
-sns.displot(df, x="accelerations", hue="fetal_health", kind="kde", fill=True)
-plt.show()
-
 print("There are total "+str(len(df))+" rows in the dataset")
 
 X = df.drop(["fetal_health"],axis=1)
@@ -119,19 +75,46 @@ X_train_nm2, y_train_nm2 = nm2.fit_resample(X_train, y_train)
 nm3 = NearMiss(version = 3)
 X_train_nm3, y_train_nm3 = nm3.fit_resample(X_train, y_train)
 
+
+
 def evaluate_model(clf, X_test, y_test, model_name, oversample_type):
   print('--------------------------------------------')
   print('Model ', model_name)
   print('Data Type ', oversample_type)
   y_pred = clf.predict(X_test)
+
   f1 = f1_score(y_test, y_pred, average='weighted')
   recall = recall_score(y_test, y_pred, average='weighted')
   precision = precision_score(y_test, y_pred, average='weighted')
   print(classification_report(y_test, y_pred))
-  print("F1 Score ", f1)
-  print("Recall ", recall)
-  print("Precision ", precision)
-  return [model_name, oversample_type, f1, recall, precision]
+  balanced = balanced_accuracy_score(y_test, y_pred)
+ 
+     
+
+  f1= round(f1,2)
+  recall= round(recall,2)
+  precision= round(precision,2)
+  balanced= round(balanced,2)
+  
+
+
+  print("F1 Score",f1)
+  print("Recall",recall)
+  print("Precision", precision)
+  print("Balanced Accuracy Score", balanced)
+  roc=0
+  if ( model_name == 'DecisionTrees' or model_name == 'RandomForest' or model_name == 'AdaBoostClassifier') :
+    y_prob = clf.predict_proba(X_test)
+    roc = roc_auc_score(y_test, y_prob, multi_class="ovo",  average="macro")
+    print("ROC", roc)
+    roc= round(roc,2)
+
+    
+  
+  
+  
+  
+  return [model_name, oversample_type, f1, recall, precision, balanced, roc]
 
 models = {
     'DecisionTrees': DecisionTreeClassifier(random_state=42),
@@ -142,12 +125,12 @@ models = {
 }
 
 sampled_data = {
-    'ACTUAL':[X_train, y_train],
+    'Default':[X_train, y_train],
     'SMOTE':[X_train_sm, y_train_sm], 
-    'TOMEK LINKS':[X_train_tl, y_train_tl],
-    'NEAR MISS - 1':[X_train_nm, y_train_nm],
-    'NEAR MISS - 2':[X_train_nm2, y_train_nm2],
-    'NEAR MISS - 3':[X_train_nm3, y_train_nm3],
+    'Tomek Links':[X_train_tl, y_train_tl],
+    'Near Miss 1':[X_train_nm, y_train_nm],
+    'Near Miss 2':[X_train_nm2, y_train_nm2],
+    'Near Miss 3':[X_train_nm3, y_train_nm3]
 
 }
 
@@ -157,7 +140,56 @@ for model_k, model_clf in models.items():
     model_clf.fit(data[0], data[1])
     final_output.append(evaluate_model(model_clf, X_test, y_test, model_k, data_type))
 
-final_df = pd.DataFrame(final_output, columns=['Model', 'DataType', 'F1', 'Recall', 'Precision'])
+final_df = pd.DataFrame(final_output, columns=['Model', 'DataType', 'F1', 'Recall','Precision','Balanced Accuracy', 'ROC'])
+print(final_df)
 
-print(final_df.sort_values(by="F1", ascending=False))
+def grouped_bar_imbalance(loss_arr):
+	methods = ['Default', 'Tomek Links', 'SMOTE', 'Near Miss1']
+	labels = ['Random Forest', 'Linear SVC', 'AdaBoostClassifier', 'DecisionTrees', 'SGD']
 
+	width = 0.8 / len(loss_arr)
+	Pos = np.array(range(len(loss_arr[0])))
+	fig, ax = plt.subplots(figsize=(12, 8))
+	bars = []
+	for i in range(len(loss_arr)):
+		bars.append(ax.bar(Pos + i * width, loss_arr[i], width=width, label=methods[i]))
+
+	ax.set_xticks(Pos + width / 4)
+	ax.set_xticklabels(labels)
+	ax.bar_label(bars[0], padding=1)
+	ax.bar_label(bars[1], padding=1)
+	ax.bar_label(bars[2], padding=1)
+	ax.bar_label(bars[3], padding=1)
+	ax.legend()
+	fig.tight_layout()
+	plt.show()
+	return
+
+for j in range(2,7):
+	rf_f1 = []
+	for i in range(6, 10):
+	    rf_f1.append(final_output[i][j])
+
+	svc_f1 = []
+	for i in range(12, 16):
+		svc_f1.append(final_output[i][j])
+
+	ada_f1 = []
+	for i in range(18, 22):
+		ada_f1.append(final_output[i][j])
+
+	dts_f1 = []
+	for i in range(0,4):
+		dts_f1.append(final_output[i][j])
+
+	sgd_f1 = []
+	for i in range(24,28):
+		sgd_f1.append(final_output[i][j])
+
+	df2 = pd.DataFrame(np.array([rf_f1, svc_f1, ada_f1, dts_f1, sgd_f1]))
+	df2 = df2.T
+
+	tolist = df2.values.tolist()
+	#print(tolist)
+	#print(len(tolist))
+	grouped_bar_imbalance(tolist)
