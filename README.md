@@ -1,10 +1,6 @@
-## Advanced Topics in Machine Learning Project
-## MSc in Artificial Intelligence 
-## Aristotle University of Thessaloniki
-
-suggested in order to read big jupyter notebooks : https://nbviewer.jupyter.org/
-
-e.g https://nbviewer.jupyter.org/github/constseche/Advanced-ML/blob/master/Heart%20Disease%20Machine%20Learning%20Interpretability.ipynb
+# Advanced Topics in Machine Learning Project
+# MSc in Artificial Intelligence 
+# Aristotle University of Thessaloniki
 
 ## 1. Class Imbalance
   ### a. SMOTE 
@@ -41,3 +37,7 @@ e.g https://nbviewer.jupyter.org/github/constseche/Advanced-ML/blob/master/Heart
   
   Understanding individual predictions.
 
+
+suggested in order to read big jupyter notebooks : https://nbviewer.jupyter.org/
+
+e.g https://nbviewer.jupyter.org/github/constseche/Advanced-ML/blob/master/Heart%20Disease%20Machine%20Learning%20Interpretability.ipynb
