@@ -15,6 +15,7 @@ from costcla.metrics import cost_loss
 
 import cost_sensitive_learning
 
+# Followed the
 data = pd.read_csv("venv/data/fetal_health.csv")
 X_train, X_test, y_train, y_test = cost_sensitive_learning.pre_processing(data)
 
@@ -301,4 +302,3 @@ for classifier, label in classifiers:
     scores = cross_val_score(classifier, data.data, data.target, cv=10, scoring="neg_mean_squared_error")
     stop = time.time()
     print("%20s squared error: %0.2f (+/- %0.2f), time:%.4f" % (label, scores.mean(), scores.std() * 2, stop - start))
-

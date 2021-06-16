@@ -10,13 +10,15 @@ from sklearn.metrics import plot_confusion_matrix, confusion_matrix,  classifica
 from sklearn.ensemble import RandomForestClassifier, VotingClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.svm import LinearSVC, SVC
-from imblearn.under_sampling import RandomUnderSampler
-from imblearn.over_sampling import RandomOverSampler
 from collections import Counter
 from sklearn.preprocessing import StandardScaler
 from costcla.sampling import cost_sampling, undersampling
 import seaborn as sns
 sns.set_context('talk')
+import warnings
+warnings.simplefilter("ignore", UserWarning)
+from imblearn.under_sampling import RandomUnderSampler
+from imblearn.over_sampling import RandomOverSampler
 
 
 
@@ -29,9 +31,6 @@ def printCfm(df_cfm):
 
 def explainability(X_train, y_train, X_test, y_val):
 
-    # svc_model = LinearSVC(random_state=0).fit(X_train, y_train)
-    # y_pred = svc_model.predict(X_val)
-    # print('SVC loss:', cost_score(y_pred, y_val))
     rf_model = RandomForestClassifier(n_estimators = 200, min_samples_split= 10, min_samples_leaf =  1, max_features = 'auto', max_depth =  20, bootstrap =  False, random_state=0).fit(X_train, y_train)
 
     # ======================== Permutation ===============================
@@ -62,6 +61,7 @@ def explainability(X_train, y_train, X_test, y_val):
     shap.summary_plot(shap_values[2], X_test)
 
     return
+
 
 def pre_processing(data):
 
@@ -122,7 +122,7 @@ def grouped_bar(loss_arr):
     for i in range(len(loss_arr)):
         bars.append(ax.bar(Pos + i * width, loss_arr[i], width=width, label=methods[i]))
 
-    ax.set_xticks(Pos + width / 4, color = 'white')
+    ax.set_xticks(Pos + width / 4)
     ax.set_xticklabels(labels)
     ax.bar_label(bars[0], padding=3)
     ax.bar_label(bars[1], padding=3)
@@ -133,6 +133,37 @@ def grouped_bar(loss_arr):
     plt.show()
 
     return
+
+def g3(loss_arr):
+
+    methods = ['Default', 'Costcla-calibration', 'Sigmoid calibration', 'Isotonic Calibration', 'Undersampling+Oversampling', 'Class Weighting']
+    labels = ['Random Forest']
+    width = 0.8 / len(loss_arr)
+    Pos = np.array(range(len(loss_arr[0])))
+    fig, ax = plt.subplots(figsize=(12, 10))
+    bars = []
+    for i in range(len(loss_arr)):
+        bars.append(ax.bar(Pos + i * width, loss_arr[i], width=width, label=methods[i]))
+
+    ax.set_xticks(Pos + width / 4)
+
+    ax.set_xticklabels(labels)
+    ax.bar_label(bars[0])
+    ax.bar_label(bars[1], padding=5)
+    ax.bar_label(bars[2], padding=5)
+    ax.bar_label(bars[3], padding=5)
+    ax.bar_label(bars[4], padding=5)
+    ax.bar_label(bars[5], padding=5)
+    ax.legend()
+    fig.tight_layout(pad=1, w_pad=10, h_pad=10.0)
+    plt.show()
+
+    return
+
+
+svc = np.array([[132], [129], [75], [63], [92], [146]])
+g3(svc)
+
 
 def g2(loss_arr):
 
@@ -160,7 +191,8 @@ def g2(loss_arr):
     return
 
 def cost_scores(y_pred, y_test):
-
+    conf_m = confusion_matrix(y_test, y_pred)
+    printCfm(conf_m)
     conf_m = confusion_matrix(y_test, y_pred).T
     cost_m = [[0, 4, 5], [1, 0, 1], [1, 1, 0]]
     printCfm(conf_m)
@@ -211,6 +243,7 @@ def class_weighting(X_train, y_train, X_test, y_test):
             sample_weights.append(6.)
 
     print("==========SVC with class weighting==========")
+    # class_weight = {1: 2, 2: 5, 3: 6}
     svc_model = SVC(kernel='linear', random_state=0, probability=False, C=1).fit(X_train, y_train, sample_weights)
     plot_confusion_matrix(svc_model, X_test, y_test, cmap=plt.cm.Blues)
     y_pred = svc_model.predict(X_test)
@@ -228,8 +261,6 @@ def class_weighting(X_train, y_train, X_test, y_test):
     loss = cost_scores(y_pred, y_test)
     ret_loss.append(loss)
     print('loss:', loss)
-
-
 
     print("==========Naive Bayes with class weighting==========")
     sample_weights = []
@@ -257,37 +288,37 @@ def rebalancing(X_train, y_train, X_test, y_test):
     clfs.append(RandomForestClassifier(random_state=0, n_estimators=100, max_depth=70))
     clfs.append(GaussianNB())
 
-    # under_loss = []
-    # for clf, n in zip(clfs, names):
-    #     print("==========Undersampling==========")
-    #     sampler = RandomUnderSampler(sampling_strategy={1: 200, 2: 221, 3: 132}, random_state=0)
-    #     X_rs, y_rs = sampler.fit_resample(X_train, y_train)
-    #     print(Counter(y_rs))
-    #     model = clf.fit(X_rs, y_rs)
-    #     y_pred = clf.predict(X_test)
-    #     loss = cost_scores(y_pred, y_test)
-    #     under_loss.append(loss)
-    #     print("%s" %n, "%d\n" %loss )
+    under_loss = []
+    for clf, n in zip(clfs, names):
+        print("==========Undersampling==========")
+        sampler = RandomUnderSampler(sampling_strategy={1: 200, 2: 221, 3: 132}, random_state=0)
+        X_rs, y_rs = sampler.fit_resample(X_train, y_train)
+        print(Counter(y_rs))
+        model = clf.fit(X_rs, y_rs)
+        y_pred = clf.predict(X_test)
+        loss = cost_scores(y_pred, y_test)
+        under_loss.append(loss)
+        print("%s" %n, "%d\n" %loss )
     #
     #
-    # over_loss = []
-    # for clf, n in zip(clfs, names):
-    #     print("==========Oversampling==========")
-    #     sampler = RandomOverSampler(sampling_strategy={1: 1241, 2: 1000, 3: 1200}, random_state=0)
-    #     X_rs, y_rs = sampler.fit_resample(X_train, y_train)
-    #     print(Counter(y_rs))
-    #     model = clf.fit(X_rs, y_rs)
-    #     y_pred = clf.predict(X_test)
-    #     loss = cost_scores(y_pred, y_test)
-    #     over_loss.append(loss)
-    #     print("%s" %n, "%d\n" %loss)
+    over_loss = []
+    for clf, n in zip(clfs, names):
+        print("==========Oversampling==========")
+        sampler = RandomOverSampler(sampling_strategy={1: 1241, 2: 1000, 3: 1200}, random_state=0)
+        X_rs, y_rs = sampler.fit_resample(X_train, y_train)
+        print(Counter(y_rs))
+        model = clf.fit(X_rs, y_rs)
+        y_pred = clf.predict(X_test)
+        loss = cost_scores(y_pred, y_test)
+        over_loss.append(loss)
+        print("%s" %n, "%d\n" %loss)
 
     comb_loss = []
     count_y = Counter(y_train)
     major_class = count_y[1]
     minor_1_class = count_y[2]
     minor_2_class = count_y[3]
-    c = [1, 5, 6]
+    c = [2, 5, 6]
     cost_major = int(major_class/c[1])
     cost_minor1 = int(major_class/c[0])
     cost_minor2 = int(major_class / c[0])
@@ -400,20 +431,18 @@ def voting_scores(X_train, y_train, X_test, y_test):
 
 
 # def run():
-data = pd.read_csv("../data/fetal_health.csv")
+data = pd.read_csv("/Users/conatseche/PycharmProjects/Advanced-ML/data/fetal_health.csv")
 X_train, X_test, y_train, y_test = pre_processing(data)
 # # explainable(X_train, y_train, X_test,  y_test)
 default_loss = default_metrics(X_train, y_train, X_test, y_test)
-under_loss, over_loss, comb_loss =  rebalancing(X_train, y_train, X_test, y_test)
-# class_weighting_loss = class_weighting(X_train, y_train, X_test, y_test)
-# rej_loss = voting_scores(X_train, y_train, X_test, y_test)
-# df2 = pd.DataFrame(np.array([default_loss, comb_loss, class_weighting_loss, rej_loss]))
-# # df2 = df2.T
-# # df2.columns = ['default', 'oversampling', 'class_weighting', 'rejection_sampling']
-# # print(df2)8
-# tolist = df2.values.tolist()
-# grouped_bar(tolist)
+under_loss=  rebalancing(X_train, y_train, X_test, y_test)
+class_weighting_loss = class_weighting(X_train, y_train, X_test, y_test)
+rej_loss = voting_scores(X_train, y_train, X_test, y_test)
+df2 = pd.DataFrame(np.array([default_loss, under_loss, class_weighting_loss, rej_loss]))
+# df2 = df2.T
+# df2.columns = ['default', 'oversampling', 'class_weighting', 'rejection_sampling']
+# print(df2)8
+tolist = df2.values.tolist()
+grouped_bar(tolist)
 
 # under over comb class weighting rejection sam0ling
-# svc = np.array([[21], [18], [25], [22], [12]])
-# g2(svc)
