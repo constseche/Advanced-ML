@@ -6,7 +6,10 @@
    ### a. SMOTE 
    ### b. Tomek Links 
    ### c. NearMiss
-
+   
+###### Class Imbalance Jupyter Notebook :
+   1. github : https://github.com/constseche/Advanced-ML/blob/master/Class_Imbalance/Class_Imbalance.ipynb
+   2. nbviewer : https://nbviewer.jupyter.org/github/constseche/Advanced-ML/blob/master/Class_Imbalance/Class_Imbalance.ipynb
 
 ## 2. Cost-Sensitive Learning
   ### a. Class Weighting
@@ -36,8 +39,13 @@
   ### c. SHAP Values 
   
   Understanding individual predictions.
-
+  
+###### Machine Learning Explainability
+###### Heart Disease Dataset
+   1. github : https://github.com/constseche/Advanced-ML/blob/master/Interpretability/Heart%20Disease%20Machine%20Learning%20Interpretability.ipynb
+   2. nbviewer : https://nbviewer.jupyter.org/github/constseche/Advanced-ML/blob/master/Interpretability/Heart%20Disease%20Machine%20Learning%20Interpretability.ipynb
+###### Fetal Health Dataset 
+   1. github : https://github.com/constseche/Advanced-ML/blob/master/Interpretability/explainable_fetal.ipynb
+   2. nbviewer : https://nbviewer.jupyter.org/github/constseche/Advanced-ML/blob/master/Interpretability/explainable_fetal.ipynb
 
 suggested in order to read big jupyter notebooks : https://nbviewer.jupyter.org/
-
-e.g https://nbviewer.jupyter.org/github/constseche/Advanced-ML/blob/master/Heart%20Disease%20Machine%20Learning%20Interpretability.ipynb
