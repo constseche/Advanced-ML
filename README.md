@@ -23,14 +23,17 @@ COST SENSITIVE LEARNING: Cost_Sensitive_Learning folder
   b.	With sigmoid calibration 
   c.	With isotonic calibration
 
-### 3. Machine Learning Explainability
-  a. Permutation Importance
+## 3. Machine Learning Explainability
+  ### a. Permutation Importance
+  
   What features does a model think are important ? 
   Which features might have a greater impact on the model predictions than the others ? 
 
-  b. Partial Dependence Plots 
+  ### b. Partial Dependence Plots 
+  
   How does each feature affect your predictions ? 
 
-  c. SHAP Values 
+  ### c. SHAP Values 
+  
   Understanding individual predictions.
 
