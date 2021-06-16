@@ -3,9 +3,9 @@
 # Aristotle University of Thessaloniki
 
 ## 1. Class Imbalance
-  ### a. SMOTE 
-  ### b. Tomek Links 
-  ### c. NearMiss
+    ### a. SMOTE 
+    ### b. Tomek Links 
+    ### c. NearMiss
 
 
 ## 2. Cost-Sensitive Learning
