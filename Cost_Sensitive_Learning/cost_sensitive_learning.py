@@ -4,8 +4,6 @@ import sns as sns
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from IPython.core.display import display
-from costcla import BayesMinimumRiskClassifier
-from sklearn.calibration import CalibratedClassifierCV
 from sklearn.metrics import plot_confusion_matrix, confusion_matrix,  classification_report
 from sklearn.ensemble import RandomForestClassifier, VotingClassifier
 from sklearn.naive_bayes import GaussianNB
@@ -130,62 +128,6 @@ def grouped_bar(loss_arr):
     ax.bar_label(bars[3], padding=3)
     ax.legend()
     fig.tight_layout(pad=0.4, w_pad=0.5, h_pad=1.0)
-    plt.show()
-
-    return
-
-def g3(loss_arr):
-
-    methods = ['Default', 'Costcla-calibration', 'Sigmoid calibration', 'Isotonic Calibration', 'Undersampling+Oversampling', 'Class Weighting']
-    labels = ['Random Forest']
-    width = 0.8 / len(loss_arr)
-    Pos = np.array(range(len(loss_arr[0])))
-    fig, ax = plt.subplots(figsize=(12, 10))
-    bars = []
-    for i in range(len(loss_arr)):
-        bars.append(ax.bar(Pos + i * width, loss_arr[i], width=width, label=methods[i]))
-
-    ax.set_xticks(Pos + width / 4)
-
-    ax.set_xticklabels(labels)
-    ax.bar_label(bars[0])
-    ax.bar_label(bars[1], padding=5)
-    ax.bar_label(bars[2], padding=5)
-    ax.bar_label(bars[3], padding=5)
-    ax.bar_label(bars[4], padding=5)
-    ax.bar_label(bars[5], padding=5)
-    ax.legend()
-    fig.tight_layout(pad=1, w_pad=10, h_pad=10.0)
-    plt.show()
-
-    return
-
-
-svc = np.array([[132], [129], [75], [63], [92], [146]])
-g3(svc)
-
-
-def g2(loss_arr):
-
-    methods = ['Undersampling', 'Oversampling', 'Combination', 'Class Weighting', 'Costing-Rejection Sampling']
-    labels = ['SVC']
-    width = 1 / len(loss_arr)
-    Pos = np.array(range(len(loss_arr[0])))
-    fig, ax = plt.subplots(figsize=(10, 9))
-    bars = []
-    for i in range(len(loss_arr)):
-        bars.append(ax.bar(Pos + i * width, loss_arr[i], width=width, label=methods[i]))
-
-    ax.set_xticks(Pos + width)
-
-    ax.set_xticklabels(labels)
-    ax.bar_label(bars[0])
-    ax.bar_label(bars[1], padding=10)
-    ax.bar_label(bars[2], padding=5)
-    ax.bar_label(bars[3], padding=5)
-    ax.bar_label(bars[4], padding=5)
-    ax.legend()
-    fig.tight_layout(pad=1, w_pad=10, h_pad=10.0)
     plt.show()
 
     return
@@ -444,5 +386,3 @@ df2 = pd.DataFrame(np.array([default_loss, under_loss, class_weighting_loss, rej
 # print(df2)8
 tolist = df2.values.tolist()
 grouped_bar(tolist)
-
-# under over comb class weighting rejection sam0ling
