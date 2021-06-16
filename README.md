@@ -14,7 +14,7 @@ COST SENSITIVE LEARNING: Cost_Sensitive_Learning folder
   c.	Combination of the above 
   
 3.	Costing-Rejection Sampling combining with hard voting (Ensemble models)
-4.	
+
 5.	Minimizing the cost: (this is used only in binary classification problem because some costcla       features don’t offer possibilities for multiclass cost-matrix)
   a.	Without calibration
   b.	With sigmoid calibration 
