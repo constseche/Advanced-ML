@@ -25,7 +25,14 @@
       a.	Without calibration
       b.	With sigmoid calibration 
       c.	With isotonic calibration
-
+######  Cost-Sensitive Learning Jupyter Notebook :
+###### A) Binary
+   1. github : https://github.com/constseche/Advanced-ML/blob/master/Cost_Sensitive_Learning/cost_sensitive_learning_binary.ipynb
+   2. nbviewer : https://nbviewer.jupyter.org/github/constseche/Advanced-ML/blob/master/Cost_Sensitive_Learning/cost_sensitive_learning_binary.ipynb
+###### B) Multiclass
+   1. github : https://github.com/constseche/Advanced-ML/blob/master/Cost_Sensitive_Learning/cost_sensitive_learning.ipynb
+   2. nbviewer : https://nbviewer.jupyter.org/github/constseche/Advanced-ML/blob/master/Cost_Sensitive_Learning/cost_sensitive_learning.ipynb
+   3. 
 ## 3. Machine Learning Explainability
   ### a. Permutation Importance
   
@@ -40,11 +47,11 @@
   
   Understanding individual predictions.
   
-###### Machine Learning Explainability
-###### Heart Disease Dataset
+###### Machine Learning Explainability Jupyter Notebook :
+###### A) Heart Disease Dataset 
    1. github : https://github.com/constseche/Advanced-ML/blob/master/Interpretability/Heart%20Disease%20Machine%20Learning%20Interpretability.ipynb
    2. nbviewer : https://nbviewer.jupyter.org/github/constseche/Advanced-ML/blob/master/Interpretability/Heart%20Disease%20Machine%20Learning%20Interpretability.ipynb
-###### Fetal Health Dataset 
+###### B) Fetal Health Dataset 
    1. github : https://github.com/constseche/Advanced-ML/blob/master/Interpretability/explainable_fetal.ipynb
    2. nbviewer : https://nbviewer.jupyter.org/github/constseche/Advanced-ML/blob/master/Interpretability/explainable_fetal.ipynb
 
